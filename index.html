@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Basic Services — Service Level of Toilet Facility</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy: #0d3b6e;
+      --navy-mid: #1a5296;
+      --navy-light: #3a7cb8;
+      --green: #1d9e75;
+      --green-dark: #0f6e56;
+      --blue: #378add;
+      --blue-dark: #185fa5;
+      --orange: #d85a30;
+      --orange-dark: #993c1d;
+      --gray: #888780;
+      --gray-dark: #5f5e5a;
+      --bg: #f8f9fb;
+      --surface: #ffffff;
+      --border: rgba(0,0,0,0.08);
+      --text-primary: #1a1f2e;
+      --text-secondary: #6b7280;
+      --text-muted: #9ca3af;
+      --radius: 10px;
+      --radius-lg: 16px;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text-primary);
+      min-height: 100vh;
+      padding: 0;
+    }
+
+    .page-wrap {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 40px 24px 60px;
+    }
+
+    /* ── HEADER ── */
+    .header {
+      margin-bottom: 36px;
+    }
+
+    .header-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--navy-light);
+      margin-bottom: 6px;
+    }
+
+    .header h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 36px;
+      font-weight: 400;
+      color: var(--navy);
+      line-height: 1.1;
+      margin-bottom: 4px;
+    }
+
+    .header h1 em {
+      font-style: italic;
+      color: var(--navy-light);
+    }
+
+    .header-sub {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-top: 6px;
+    }
+
+    /* ── STAT CARDS ── */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      padding: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      border-radius: var(--radius) var(--radius) 0 0;
+    }
+
+    .stat-card.green::before { background: var(--green); }
+    .stat-card.blue::before  { background: var(--blue); }
+    .stat-card.orange::before { background: var(--orange); }
+    .stat-card.gray::before  { background: var(--gray); }
+
+    .stat-label {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 8px;
+    }
+
+    .stat-num {
+      font-size: 28px;
+      font-weight: 600;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .stat-card.green .stat-num { color: var(--green-dark); }
+    .stat-card.blue .stat-num  { color: var(--blue-dark); }
+    .stat-card.orange .stat-num { color: var(--orange-dark); }
+    .stat-card.gray .stat-num  { color: var(--gray-dark); }
+
+    .stat-pct {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* ── CONTROLS ── */
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px 16px;
+    }
+
+    .controls label {
+      font-size: 12px;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .controls select {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 12px;
+      padding: 5px 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--bg);
+      color: var(--text-primary);
+      cursor: pointer;
+      outline: none;
+    }
+
+    .controls select:hover { border-color: var(--navy-light); }
+
+    .divider {
+      width: 1px;
+      height: 18px;
+      background: var(--border);
+    }
+
+    /* ── LEGEND ── */
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .legend-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+
+    /* ── CHART ── */
+    .chart-card {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      padding: 20px 20px 16px;
+    }
+
+    .chart-wrap {
+      position: relative;
+      width: 100%;
+    }
+
+    /* ── DEFINITIONS BOX ── */
+    .defs {
+      margin-top: 24px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .def-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px 14px;
+      border-left: 3px solid transparent;
+    }
+
+    .def-item.green  { border-left-color: var(--green); }
+    .def-item.blue   { border-left-color: var(--blue); }
+    .def-item.orange { border-left-color: var(--orange); }
+    .def-item.gray   { border-left-color: var(--gray); }
+
+    .def-title {
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .def-item.green  .def-title { color: var(--green-dark); }
+    .def-item.blue   .def-title { color: var(--blue-dark); }
+    .def-item.orange .def-title { color: var(--orange-dark); }
+    .def-item.gray   .def-title { color: var(--gray-dark); }
+
+    .def-text {
+      font-size: 11px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    /* ── FOOTER ── */
+    .footer {
+      margin-top: 32px;
+      font-size: 11px;
+      color: var(--text-muted);
+      text-align: center;
+    }
+
+    @media (max-width: 600px) {
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .defs { grid-template-columns: 1fr; }
+      .header h1 { font-size: 26px; }
+    }
+  </style>
+</head>
+<body>
+<div class="page-wrap">
+
+  <div class="header">
+    <p class="header-label">Basic Services</p>
+    <h1>Service Level of <em>Toilet Facility</em></h1>
+    <p class="header-sub">Barangay-level breakdown — 14,093 total households</p>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card green">
+      <p class="stat-label">Basic</p>
+      <p class="stat-num">9,681</p>
+      <p class="stat-pct">68.7% of total</p>
+    </div>
+    <div class="stat-card blue">
+      <p class="stat-label">Limited</p>
+      <p class="stat-num">3,631</p>
+      <p class="stat-pct">25.8% of total</p>
+    </div>
+    <div class="stat-card orange">
+      <p class="stat-label">Open defecation</p>
+      <p class="stat-num">529</p>
+      <p class="stat-pct">3.8% of total</p>
+    </div>
+    <div class="stat-card gray">
+      <p class="stat-label">Unimproved</p>
+      <p class="stat-num">252</p>
+      <p class="stat-pct">1.8% of total</p>
+    </div>
+  </div>
+
+  <div class="controls">
+    <label>Sort by</label>
+    <select id="sortSel">
+      <option value="basic">Basic (highest)</option>
+      <option value="limited">Limited (highest)</option>
+      <option value="od">Open defecation (highest)</option>
+      <option value="total">Total households</option>
+      <option value="name">Barangay name</option>
+    </select>
+    <div class="divider"></div>
+    <label>Show</label>
+    <select id="viewSel">
+      <option value="all">All barangays</option>
+      <option value="top10">Top 10 by total</option>
+      <option value="risk">High risk (OD > 0)</option>
+    </select>
+  </div>
+
+  <div class="chart-card">
+    <div class="legend">
+      <div class="legend-item"><span class="legend-dot" style="background:var(--green)"></span>Basic</div>
+      <div class="legend-item"><span class="legend-dot" style="background:var(--blue)"></span>Limited</div>
+      <div class="legend-item"><span class="legend-dot" style="background:var(--orange)"></span>Open defecation</div>
+      <div class="legend-item"><span class="legend-dot" style="background:var(--gray)"></span>Unimproved</div>
+    </div>
+    <div class="chart-wrap">
+      <canvas id="toiletChart" role="img" aria-label="Stacked horizontal bar chart of toilet facility service levels by barangay"></canvas>
+    </div>
+  </div>
+
+  <div class="defs">
+    <div class="def-item green">
+      <p class="def-title">Basic</p>
+      <p class="def-text">Sanitation facility designed to hygienically separate excreta from human contact, not shared with other households.</p>
+    </div>
+    <div class="def-item blue">
+      <p class="def-title">Limited</p>
+      <p class="def-text">Sanitation facility designed to hygienically separate excreta from human contact, shared with other households.</p>
+    </div>
+    <div class="def-item orange">
+      <p class="def-title">Open defecation</p>
+      <p class="def-text">Disposal of human feces in fields, forests, open bodies of water, beaches or other open spaces or with solid waste.</p>
+    </div>
+    <div class="def-item gray">
+      <p class="def-title">Unimproved</p>
+      <p class="def-text">Pit latrines without a slab or platform, hanging latrines or bucket latrines.</p>
+    </div>
+  </div>
+
+  <p class="footer">Data source: Barangay-level household survey &nbsp;·&nbsp; Total households: 14,093</p>
+
+</div>
+
+<script>
+  const raw = [
+    {name:'Agdangan Pob.',total:961,basic:747,limited:158,unim:13,od:43},
+    {name:'Antipolo',total:209,basic:192,limited:0,unim:17,od:0},
+    {name:'Bagumbayan',total:426,basic:332,limited:89,unim:5,od:0},
+    {name:'Buluang',total:1719,basic:1171,limited:441,unim:8,od:99},
+    {name:'Caranday',total:247,basic:114,limited:75,unim:44,od:14},
+    {name:'Cristo Rey',total:62,basic:52,limited:10,unim:0,od:0},
+    {name:'Del Pilar',total:119,basic:66,limited:8,unim:18,od:27},
+    {name:'Del Rosario (Pob.)',total:224,basic:161,limited:62,unim:1,od:0},
+    {name:'Iyagan',total:263,basic:153,limited:33,unim:10,od:67},
+    {name:'La Medalla',total:594,basic:424,limited:110,unim:2,od:58},
+    {name:'Lourdes',total:83,basic:59,limited:4,unim:0,od:20},
+    {name:'Nababarera',total:78,basic:44,limited:34,unim:0,od:0},
+    {name:'Pugay',total:334,basic:287,limited:46,unim:1,od:0},
+    {name:'Sagrada',total:1043,basic:748,limited:217,unim:2,od:76},
+    {name:'Salvacion',total:722,basic:472,limited:248,unim:1,od:1},
+    {name:'San Francisco (Pob.)',total:530,basic:362,limited:160,unim:1,od:7},
+    {name:'San Isidro',total:1248,basic:727,limited:517,unim:1,od:3},
+    {name:'San Jose (Pob.)',total:546,basic:331,limited:191,unim:22,od:2},
+    {name:'San Juan',total:828,basic:584,limited:243,unim:0,od:1},
+    {name:'San Nicolas (Pob.)',total:377,basic:302,limited:68,unim:7,od:0},
+    {name:'San Rafael',total:84,basic:30,limited:46,unim:5,od:3},
+    {name:'San Ramon (Pob.)',total:150,basic:94,limited:54,unim:0,od:2},
+    {name:'San Roque (Pob.)',total:205,basic:159,limited:36,unim:10,od:0},
+    {name:'San Vicente',total:1196,basic:762,limited:399,unim:9,od:26},
+    {name:'Santa Cruz (Pob.)',total:573,basic:527,limited:43,unim:2,od:1},
+    {name:'Santa Eulalia',total:207,basic:80,limited:92,unim:12,od:23},
+    {name:'Santa Isabel',total:132,basic:20,limited:102,unim:0,od:10},
+    {name:'Santa Teresa',total:68,basic:22,limited:7,unim:27,od:12},
+    {name:'Santa Teresita',total:660,basic:512,limited:117,unim:2,od:29},
+    {name:'Tapol',total:205,basic:147,limited:21,unim:32,od:5},
+  ];
+
+  let chart;
+
+  function getFiltered(sortVal, viewVal) {
+    let data = [...raw];
+    if (viewVal === 'top10') data = [...data].sort((a,b) => b.total - a.total).slice(0,10);
+    if (viewVal === 'risk') data = data.filter(d => d.od > 0);
+    if (sortVal === 'basic') data.sort((a,b) => b.basic - a.basic);
+    else if (sortVal === 'limited') data.sort((a,b) => b.limited - a.limited);
+    else if (sortVal === 'od') data.sort((a,b) => b.od - a.od);
+    else if (sortVal === 'total') data.sort((a,b) => b.total - a.total);
+    else if (sortVal === 'name') data.sort((a,b) => a.name.localeCompare(b.name));
+    return data;
+  }
+
+  function buildChart() {
+    const sortVal = document.getElementById('sortSel').value;
+    const viewVal = document.getElementById('viewSel').value;
+    const data = getFiltered(sortVal, viewVal);
+    const labels = data.map(d => d.name);
+    const h = Math.max(320, data.length * 40 + 70);
+    document.querySelector('.chart-wrap').style.height = h + 'px';
+
+    if (chart) chart.destroy();
+    chart = new Chart(document.getElementById('toiletChart'), {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [
+          { label: 'Basic',           data: data.map(d=>d.basic),   backgroundColor: '#1d9e75' },
+          { label: 'Limited',         data: data.map(d=>d.limited), backgroundColor: '#378add' },
+          { label: 'Open defecation', data: data.map(d=>d.od),      backgroundColor: '#d85a30' },
+          { label: 'Unimproved',      data: data.map(d=>d.unim),    backgroundColor: '#888780' },
+        ]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: ctx => {
+                const d = data[ctx.dataIndex];
+                const pct = Math.round(ctx.parsed.x / d.total * 100);
+                return ` ${ctx.dataset.label}: ${ctx.parsed.x.toLocaleString()} (${pct}%)`;
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            stacked: true,
+            grid: { color: 'rgba(0,0,0,0.05)' },
+            ticks: { font: { family: "'DM Sans', sans-serif", size: 11 }, color: '#9ca3af' }
+          },
+          y: {
+            stacked: true,
+            grid: { display: false },
+            ticks: { font: { family: "'DM Sans', sans-serif", size: 11 }, color: '#374151' }
+          }
+        }
+      }
+    });
+  }
+
+  buildChart();
+  document.getElementById('sortSel').addEventListener('change', buildChart);
+  document.getElementById('viewSel').addEventListener('change', buildChart);
+</script>
+</body>
+</html>
