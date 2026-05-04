@@ -1,0 +1,157 @@
+
+<h2 class="sr-only">Basic Services: Service Level of Toilet Facility by Barangay</h2>
+
+<div style="padding: 1rem 0;">
+
+<div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 1.5rem;">
+  <div style="background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 12px;">
+    <p style="font-size: 11px; color: var(--color-text-secondary); margin: 0 0 4px;">Basic</p>
+    <p style="font-size: 22px; font-weight: 500; color: #0f6e56; margin: 0;">9,681</p>
+    <p style="font-size: 11px; color: var(--color-text-secondary); margin: 2px 0 0;">68.7%</p>
+  </div>
+  <div style="background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 12px;">
+    <p style="font-size: 11px; color: var(--color-text-secondary); margin: 0 0 4px;">Limited</p>
+    <p style="font-size: 22px; font-weight: 500; color: #185fa5; margin: 0;">3,631</p>
+    <p style="font-size: 11px; color: var(--color-text-secondary); margin: 2px 0 0;">25.8%</p>
+  </div>
+  <div style="background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 12px;">
+    <p style="font-size: 11px; color: var(--color-text-secondary); margin: 0 0 4px;">Open defecation</p>
+    <p style="font-size: 22px; font-weight: 500; color: #993c1d; margin: 0;">529</p>
+    <p style="font-size: 11px; color: var(--color-text-secondary); margin: 2px 0 0;">3.8%</p>
+  </div>
+  <div style="background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 12px;">
+    <p style="font-size: 11px; color: var(--color-text-secondary); margin: 0 0 4px;">Unimproved</p>
+    <p style="font-size: 22px; font-weight: 500; color: #5f5e5a; margin: 0;">252</p>
+    <p style="font-size: 11px; color: var(--color-text-secondary); margin: 2px 0 0;">1.8%</p>
+  </div>
+</div>
+
+<div style="display: flex; align-items: center; gap: 12px; margin-bottom: 1rem; flex-wrap: wrap;">
+  <span style="font-size: 12px; color: var(--color-text-secondary);">Sort by:</span>
+  <select id="sortSel" style="font-size: 12px;">
+    <option value="basic">Basic (highest)</option>
+    <option value="limited">Limited (highest)</option>
+    <option value="od">Open defecation (highest)</option>
+    <option value="total">Total households</option>
+    <option value="name">Barangay name</option>
+  </select>
+  <span style="font-size: 12px; color: var(--color-text-secondary); margin-left: 8px;">Show:</span>
+  <select id="viewSel" style="font-size: 12px;">
+    <option value="all">All barangays</option>
+    <option value="top10">Top 10 by total</option>
+    <option value="risk">High risk (OD > 0)</option>
+  </select>
+</div>
+
+<div style="position: relative; width: 100%;">
+  <canvas id="toiletChart" role="img" aria-label="Stacked bar chart showing toilet facility service levels by barangay"></canvas>
+</div>
+
+<div style="display: flex; flex-wrap: wrap; gap: 16px; margin-top: 12px; font-size: 12px; color: var(--color-text-secondary);">
+  <span style="display:flex;align-items:center;gap:5px;"><span style="width:12px;height:12px;border-radius:2px;background:#1d9e75;display:inline-block;"></span>Basic</span>
+  <span style="display:flex;align-items:center;gap:5px;"><span style="width:12px;height:12px;border-radius:2px;background:#378add;display:inline-block;"></span>Limited</span>
+  <span style="display:flex;align-items:center;gap:5px;"><span style="width:12px;height:12px;border-radius:2px;background:#d85a30;display:inline-block;"></span>Open defecation</span>
+  <span style="display:flex;align-items:center;gap:5px;"><span style="width:12px;height:12px;border-radius:2px;background:#888780;display:inline-block;"></span>Unimproved</span>
+</div>
+
+<button onclick="sendPrompt('Which barangays have the highest open defecation rates and what interventions might help?')" style="margin-top: 1rem; font-size: 12px; padding: 5px 12px;">Identify high-risk barangays ↗</button>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const raw = [
+  {name:'Agdangan Pob.',total:961,basic:747,limited:158,unim:13,od:43},
+  {name:'Antipolo',total:209,basic:192,limited:0,unim:17,od:0},
+  {name:'Bagumbayan',total:426,basic:332,limited:89,unim:5,od:0},
+  {name:'Buluang',total:1719,basic:1171,limited:441,unim:8,od:99},
+  {name:'Caranday',total:247,basic:114,limited:75,unim:44,od:14},
+  {name:'Cristo Rey',total:62,basic:52,limited:10,unim:0,od:0},
+  {name:'Del Pilar',total:119,basic:66,limited:8,unim:18,od:27},
+  {name:'Del Rosario (Pob.)',total:224,basic:161,limited:62,unim:1,od:0},
+  {name:'Iyagan',total:263,basic:153,limited:33,unim:10,od:67},
+  {name:'La Medalla',total:594,basic:424,limited:110,unim:2,od:58},
+  {name:'Lourdes',total:83,basic:59,limited:4,unim:0,od:20},
+  {name:'Nababarera',total:78,basic:44,limited:34,unim:0,od:0},
+  {name:'Pugay',total:334,basic:287,limited:46,unim:1,od:0},
+  {name:'Sagrada',total:1043,basic:748,limited:217,unim:2,od:76},
+  {name:'Salvacion',total:722,basic:472,limited:248,unim:1,od:1},
+  {name:'San Francisco (Pob.)',total:530,basic:362,limited:160,unim:1,od:7},
+  {name:'San Isidro',total:1248,basic:727,limited:517,unim:1,od:3},
+  {name:'San Jose (Pob.)',total:546,basic:331,limited:191,unim:22,od:2},
+  {name:'San Juan',total:828,basic:584,limited:243,unim:0,od:1},
+  {name:'San Nicolas (Pob.)',total:377,basic:302,limited:68,unim:7,od:0},
+  {name:'San Rafael',total:84,basic:30,limited:46,unim:5,od:3},
+  {name:'San Ramon (Pob.)',total:150,basic:94,limited:54,unim:0,od:2},
+  {name:'San Roque (Pob.)',total:205,basic:159,limited:36,unim:10,od:0},
+  {name:'San Vicente',total:1196,basic:762,limited:399,unim:9,od:26},
+  {name:'Santa Cruz (Pob.)',total:573,basic:527,limited:43,unim:2,od:1},
+  {name:'Santa Eulalia',total:207,basic:80,limited:92,unim:12,od:23},
+  {name:'Santa Isabel',total:132,basic:20,limited:102,unim:0,od:10},
+  {name:'Santa Teresa',total:68,basic:22,limited:7,unim:27,od:12},
+  {name:'Santa Teresita',total:660,basic:512,limited:117,unim:2,od:29},
+  {name:'Tapol',total:205,basic:147,limited:21,unim:32,od:5},
+];
+
+let chart;
+
+function getFiltered(sortVal, viewVal) {
+  let data = [...raw];
+  if (viewVal === 'top10') data = [...data].sort((a,b) => b.total - a.total).slice(0,10);
+  if (viewVal === 'risk') data = data.filter(d => d.od > 0);
+  if (sortVal === 'basic') data.sort((a,b) => b.basic - a.basic);
+  else if (sortVal === 'limited') data.sort((a,b) => b.limited - a.limited);
+  else if (sortVal === 'od') data.sort((a,b) => b.od - a.od);
+  else if (sortVal === 'total') data.sort((a,b) => b.total - a.total);
+  else if (sortVal === 'name') data.sort((a,b) => a.name.localeCompare(b.name));
+  return data;
+}
+
+function buildChart() {
+  const sortVal = document.getElementById('sortSel').value;
+  const viewVal = document.getElementById('viewSel').value;
+  const data = getFiltered(sortVal, viewVal);
+  const labels = data.map(d => d.name);
+  const h = Math.max(300, data.length * 38 + 60);
+  document.getElementById('toiletChart').parentElement.style.height = h + 'px';
+
+  if (chart) chart.destroy();
+  chart = new Chart(document.getElementById('toiletChart'), {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        { label: 'Basic', data: data.map(d=>d.basic), backgroundColor: '#1d9e75', borderSkipped: false },
+        { label: 'Limited', data: data.map(d=>d.limited), backgroundColor: '#378add', borderSkipped: false },
+        { label: 'Open defecation', data: data.map(d=>d.od), backgroundColor: '#d85a30', borderSkipped: false },
+        { label: 'Unimproved', data: data.map(d=>d.unim), backgroundColor: '#888780', borderSkipped: false },
+      ]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => {
+              const d = data[ctx.dataIndex];
+              const pct = Math.round(ctx.parsed.x / d.total * 100);
+              return ` ${ctx.dataset.label}: ${ctx.parsed.x} (${pct}%)`;
+            }
+          }
+        }
+      },
+      scales: {
+        x: { stacked: true, grid: { color: 'rgba(0,0,0,0.06)' }, ticks: { font: { size: 11 } } },
+        y: { stacked: true, ticks: { font: { size: 11 }, color: '#374151' }, grid: { display: false } }
+      }
+    }
+  });
+}
+
+buildChart();
+document.getElementById('sortSel').addEventListener('change', buildChart);
+document.getElementById('viewSel').addEventListener('change', buildChart);
+</script>
